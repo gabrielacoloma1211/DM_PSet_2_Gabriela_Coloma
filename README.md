@@ -316,5 +316,7 @@ The implementation of ModSecurity with OWASP CRS successfully blocked all tested
 - OWASP ModSecurity Core Rule Set: https://coreruleset.org/
 - DVWA Project: https://github.com/digininja/DVWA
 - OWASP Top 10: https://owasp.org/www-project-top-ten/
+- DDos Attacks: https://www.netscout.com/what-is-ddos
+  
 
 
