@@ -1,9 +1,5 @@
 # Homework 3: Web Security
 
-**Course:** Seguridad Informática
-**Professor:** Alejandro Proaño
-**University:** Universidad San Francisco de Quito (USFQ)
-
 **Students:**
 - Jesus Alarcon (00324826)
 - Gabriela Coloma (00325312)
@@ -11,7 +7,7 @@
 **Date:** November 27, 2025
 
 ---
-# Part 1: Research and Analysis of DDoS Attack Techniques (Unchanged)
+# Part 1: Research and Analysis of DDoS Attack Techniques
 
 **Objective:** Students will conduct in-depth research on the common methods used to execute Distributed Denial of Service (DDoS) attacks, focusing on the layers of the OSI model they target and how they operate.
 
