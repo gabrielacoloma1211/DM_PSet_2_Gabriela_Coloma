@@ -754,98 +754,66 @@ estudios de cohorte (Sweeney et al., 2018), lo que significa que la
 simple eliminación de identificadores directos no elimina el riesgo de
 memorización de información re-identificable.
 
-**Referencias:**
+## Referencias
 
-Amnesty International. (2025a). Automated racism: How police data and
-algorithms code discrimination into policing. Amnesty International UK.
-[[https://www.amnesty.org.uk/files/2025-02/Automated%20Racism%20Report.pdf]{.underline}](https://www.amnesty.org.uk/files/2025-02/Automated%20Racism%20Report.pdf)
+- Amnesty International. (2025a). *Automated racism: How police data and algorithms code discrimination into policing*. Amnesty International UK.  
+  https://www.amnesty.org.uk/files/2025-02/Automated%20Racism%20Report%20-%20Amnesty%20International%20UK%20-%202025.pdf
 
-Amnesty International. (2025b, noviembre). Brazil: Rio de Janeiro police
-killed 121 people in horrific two-day operation.
-[[https://www.amnesty.org/en/latest/news/2025/11/brazil-rio-de-janeiro-police-killed-121-people/]{.underline}](https://www.amnesty.org/en/latest/news/2025/11/brazil-rio-de-janeiro-police-killed-121-people/)
+- Amnesty International. (2025b, noviembre). *Brazil: Rio de Janeiro police killed 121 people in horrific two-day operation*.
 
-Angwin, J., Larson, J., Mattu, S., & Kirchner, L. (2016, mayo 23).
-Machine bias: There\'s software used across the country to predict
-future criminals. And it\'s biased against blacks. ProPublica.
-[[https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing]{.underline}](https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing)
+- Angwin, J., Larson, J., Mattu, S., & Kirchner, L. (2016, mayo 23). *Machine bias: There's software used across the country to predict future criminals. And it's biased against blacks*. ProPublica.  
+  https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing
 
-Anthropic. (2025a, agosto 28). Updates to consumer terms and privacy
-policy. Anthropic News.
-[[https://www.anthropic.com/news/updates-to-our-consumer-terms]{.underline}](https://www.anthropic.com/news/updates-to-our-consumer-terms)
+- Anthropic. (2025a, agosto 28). *Updates to consumer terms and privacy policy*. Anthropic News.  
+  https://www.anthropic.com/news/updates-to-our-consumer-terms
 
-Anthropic. (2025b). Is my data used for model training?
-[[https://privacy.claude.com/en/articles/10023580-is-my-data-used-for-model-training]{.underline}](https://privacy.claude.com/en/articles/10023580-is-my-data-used-for-model-training)
+- Anthropic. (2025b). *Is my data used for model training?*  
+  https://privacy.claude.com/en/articles/10023580-is-my-data-used-for-model-training
 
-Anthropic. (2025c). Is my data used for model training?
-[[https://privacy.claude.com/en/articles/7996868-is-my-data-used-for-model-training]{.underline}](https://privacy.claude.com/en/articles/7996868-is-my-data-used-for-model-training)
+- Anthropic. (2025c). *Is my data used for model training?*  
+  https://privacy.claude.com/en/articles/7996868-is-my-data-used-for-model-training
 
-Asamblea Nacional del Ecuador. (2021). Ley Orgánica de Protección de
-Datos Personales. Quinto Suplemento del Registro Oficial No. 459, 26 de
-mayo de 2021.
+- Asamblea Nacional del Ecuador. (2021). *Ley Orgánica de Protección de Datos Personales*. Quinto Suplemento del Registro Oficial No. 459, 26 de mayo de 2021.
 
-Carlini, N., Tramer, F., Wallace, E., Jagielski, M., Herbert-Voss, A.,
-Lee, K., Roberts, A., Brown, T., Song, D., Erlingsson, U., Oprea, A., &
-Raffel, C. (2021). Extracting training data from large language models.
-Proceedings of the 30th USENIX Security Symposium, 2633-2650.
+- Carlini, N., Tramer, F., Wallace, E., Jagielski, M., Herbert-Voss, A., Lee, K., Roberts, A., Brown, T., Song, D., Erlingsson, U., Oprea, A., & Raffel, C. (2021). *Extracting training data from large language models*. Proceedings of the 30th USENIX Security Symposium, 2633–2650.
 
-De La Torre v. LinkedIn Corp., No. 5:25-cv-00709 (N.D. Cal. Jan. 21,
-2025).
+- *De La Torre v. LinkedIn Corp.*, No. 5:25-cv-00709 (N.D. Cal. Jan. 21, 2025).
 
-Federal Trade Commission. (2023, mayo). FTC says Ring employees
-illegally surveilled customers, failed to stop hackers from taking
-control of users\' cameras.
-[[https://www.ftc.gov/news-events/news/press-releases/2023/05/ftc-says-ring-employees-illegally-surveilled-customers]{.underline}](https://www.ftc.gov/news-events/news/press-releases/2023/05/ftc-says-ring-employees-illegally-surveilled-customers)
+- Federal Trade Commission. (2023, mayo). *FTC says Ring employees illegally surveilled customers, failed to stop hackers from taking control of users' cameras*.  
+  https://www.ftc.gov/news-events/news/press-releases/2023/05/ftc-says-ring-employees-illegally-surveilled-customers-failed-stop-hackers-taking-control-users
 
-Garante per la Protezione dei Dati Personali. (2024, diciembre 20).
-OpenAI: Italian SA fines company €15 million.
-[[https://www.garanteprivacy.it/]{.underline}](https://www.garanteprivacy.it/)
+- Garante per la Protezione dei Dati Personali. (2024, diciembre 20). *OpenAI: Italian SA fines company €15 million*.  
+  https://www.garanteprivacy.it/
 
-Hartmann, V., Suri, A., Bindschaedler, V., Evans, D., Tople, S., & West,
-R. (2023). SoK: Memorization in general-purpose large language models.
-arXiv preprint arXiv:2310.18362.
+- Hartmann, V., Suri, A., Bindschaedler, V., Evans, D., Tople, S., & West, R. (2023). *SoK: Memorization in general-purpose large language models*. arXiv preprint arXiv:2310.18362.
 
-Temblores ONG. (2021). Protests and Human Rights Violations in Colombia:
-Second Alert. Recuperado de
-[[https://www.wola.org/2021/07/protests-and-human-rights-violations-in-colombia-second-alert/]{.underline}](https://www.wola.org/2021/07/protests-and-human-rights-violations-in-colombia-second-alert/)
+- Temblores ONG. (2021). *Protests and Human Rights Violations in Colombia: Second Alert*.  
+  https://www.wola.org/2021/07/protests-and-human-rights-violations-in-colombia-second-alert/
 
-Lum, K., & Isaac, W. (2016). To predict and serve? Significance, 13(5),
-14-19.
+- Lum, K., & Isaac, W. (2016). *To predict and serve?* Significance, 13(5), 14–19.
 
-Menta, T. R., et al. (2025). Analyzing memorization in large language
-models through the lens of model attribution. arXiv preprint
-arXiv:2501.05078.
+- Menta, T. R., et al. (2025). *Analyzing memorization in large language models through the lens of model attribution*. arXiv preprint arXiv:2501.05078.
 
-Nasr, M., Carlini, N., Hayase, J., Jagielski, M., Cooper, A. F.,
-Ippolito, D., Choquette-Choo, C. A., Wallace, E., Tramèr, F., & Lee, K.
-(2023). Scalable extraction of training data from (production) language
-models. arXiv preprint arXiv:2311.17035.
+- Nasr, M., Carlini, N., Hayase, J., Jagielski, M., Cooper, A. F., Ippolito, D., Choquette-Choo, C. A., Wallace, E., Tramèr, F., & Lee, K. (2023). *Scalable extraction of training data from (production) language models*. arXiv preprint arXiv:2311.17035.
 
-NOYB. (2025, mayo 14). NOYB sends Meta \'cease and desist\' letter over
-AI training. European class action as potential next step.
-[https://noyb.eu/en/noyb-sends-meta-cease-and-desist-letter-over-ai-training-european-class-action-potential-next-step]{.underline}
+- NOYB. (2025, mayo 14). *NOYB sends Meta “cease and desist” letter over AI training. European class action as potential next step*.  
+  https://noyb.eu/en/noyb-sends-meta-cease-and-desist-letter-over-ai-training-european-class-action-potential-next-step
 
-Obermeyer, Z., Powers, B., Vogeli, C., & Mullainathan, S. (2019).
-Dissecting racial bias in an algorithm used to manage the health of
-populations. Science, 366(6464), 447-453.
+- Obermeyer, Z., Powers, B., Vogeli, C., & Mullainathan, S. (2019). *Dissecting racial bias in an algorithm used to manage the health of populations*. Science, 366(6464), 447–453.
 
-OpenAI. (2025a). Business data privacy, security, and compliance.
-[[https://openai.com/business-data/]{.underline}](https://openai.com/business-data/)
+- OpenAI. (2025a). *Business data privacy, security, and compliance*.  
+  https://openai.com/business-data/
 
-OpenAI. (2025b). Enterprise privacy.
-[[https://openai.com/enterprise-privacy/]{.underline}](https://openai.com/enterprise-privacy/)
+- OpenAI. (2025b). *Enterprise privacy*.  
+  https://openai.com/enterprise-privacy/
 
-OpenAI. (2025c). Privacy policy.
-[[https://openai.com/policies/privacy-policy/]{.underline}](https://openai.com/policies/privacy-policy/)
+- OpenAI. (2025c). *Privacy policy*.  
+  https://openai.com/policies/privacy-policy/
 
-OpenAI Help Center. (2025). How your data is used to improve model
-performance.
-[[https://help.openai.com/en/articles/how-your-data-is-used-to-improve-model-performance]{.underline}](https://help.openai.com/en/articles/how-your-data-is-used-to-improve-model-performance)
+- OpenAI Help Center. (2025). *How your data is used to improve model performance*.  
+  https://openai.com/policies/how-your-data-is-used-to-improve-model-performance/
 
-Richardson, R., Schultz, J., & Crawford, K. (2019). Dirty data, bad
-predictions: How civil rights violations impact police data, predictive
-policing systems, and justice. NYU Law Review, 94, 192-233.
+- Richardson, R., Schultz, J., & Crawford, K. (2019). *Dirty data, bad predictions: How civil rights violations impact police data, predictive policing systems, and justice*. NYU Law Review, 94, 192–233.
 
-United Nations Human Rights Council. (2024). Racism and AI: Bias from
-the past leads to bias in the future. Office of the High Commissioner
-for Human Rights.
-[[https://www.ohchr.org/en/stories/2024/07/racism-and-ai-bias-past-leads-bias-future]{.underline}](https://www.ohchr.org/en/stories/2024/07/racism-and-ai-bias-past-leads-bias-future)
+- United Nations Human Rights Council. (2024). *Racism and AI: Bias from the past leads to bias in the future*. Office of the High Commissioner for Human Rights.  
+  https://www.ohchr.org/en/stories/2024/07/racism-and-ai-bias-past-leads-bias-future
