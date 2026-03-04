@@ -76,7 +76,7 @@ Existen 6 pipelines principales organizados por capa de la arquitectura medallio
 
 ### Pipelines Bronze
 
-#### `ingest_bronze_yellow`
+#### `yellow_taxi_trips`
 **Propósito:** Ingesta de datos Yellow Taxi desde NYC TLC (Parquet)  
 **Bloques:**
 - `loader_yellow_taxi.py` (Data Loader)
@@ -94,7 +94,7 @@ Existen 6 pipelines principales organizados por capa de la arquitectura medallio
 
 ---
 
-#### `ingest_bronze_green`
+#### `green_taxi_trips`
 **Propósito:** Ingesta de datos Green Taxi  
 **Estructura:** Idéntica a yellow, cambia solo el `service_type` a 'green'
 
