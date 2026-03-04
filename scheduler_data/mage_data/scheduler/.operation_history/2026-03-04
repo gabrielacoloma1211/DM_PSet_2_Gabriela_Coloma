@@ -1,0 +1,3 @@
+{"operation": "create", "resource": {"type": "pipeline", "uuid": "dbt_build_silver"}, "timestamp": 1772586241, "user": null}
+{"operation": "create", "resource": {"type": "pipeline", "uuid": "dbt_build_gold"}, "timestamp": 1772587802, "user": null}
+{"operation": "create", "resource": {"type": "pipeline", "uuid": "quality_checks"}, "timestamp": 1772591760, "user": null}

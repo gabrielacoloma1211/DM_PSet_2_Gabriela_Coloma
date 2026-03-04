@@ -1,0 +1,92 @@
+blocks:
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    dbt_project_name: dbt/scheduler_transformations
+    file_path: dbt/scheduler_transformations/models/silver/stg_taxi_zones.sql
+    file_source:
+      path: dbt/scheduler_transformations/models/silver/stg_taxi_zones.sql
+      project_path: dbt/scheduler_transformations
+    limit: 1000
+  downstream_blocks:
+  - dbt/scheduler_transformations/models/silver/int_trips_enriched
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: sql
+  name: dbt/scheduler_transformations/models/silver/stg_taxi_zones
+  retry_config: null
+  status: executed
+  timeout: null
+  type: dbt
+  upstream_blocks: []
+  uuid: dbt/scheduler_transformations/models/silver/stg_taxi_zones
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    dbt_project_name: dbt/scheduler_transformations
+    file_path: dbt/scheduler_transformations/models/silver/stg_taxi_trips.sql
+    file_source:
+      path: dbt/scheduler_transformations/models/silver/stg_taxi_trips.sql
+      project_path: dbt/scheduler_transformations
+    limit: 1000
+  downstream_blocks:
+  - dbt/scheduler_transformations/models/silver/int_trips_enriched
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: sql
+  name: dbt/scheduler_transformations/models/silver/stg_taxi_trips
+  retry_config: null
+  status: executed
+  timeout: null
+  type: dbt
+  upstream_blocks: []
+  uuid: dbt/scheduler_transformations/models/silver/stg_taxi_trips
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    dbt_project_name: dbt/scheduler_transformations
+    file_path: dbt/scheduler_transformations/models/silver/int_trips_enriched.sql
+    file_source:
+      path: dbt/scheduler_transformations/models/silver/int_trips_enriched.sql
+      project_path: dbt/scheduler_transformations
+    limit: 1000
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: sql
+  name: dbt/scheduler_transformations/models/silver/int_trips_enriched
+  retry_config: null
+  status: executed
+  timeout: null
+  type: dbt
+  upstream_blocks:
+  - dbt/scheduler_transformations/models/silver/stg_taxi_zones
+  - dbt/scheduler_transformations/models/silver/stg_taxi_trips
+  uuid: dbt/scheduler_transformations/models/silver/int_trips_enriched
+cache_block_output_in_memory: false
+callbacks: []
+concurrency_config: {}
+conditionals: []
+created_at: '2026-03-04 01:04:00.785948+00:00'
+data_integration: null
+description: null
+executor_config: {}
+executor_count: 1
+executor_type: null
+extensions: {}
+name: dbt_build_silver
+notification_config: {}
+remote_variables_dir: null
+retry_config: {}
+run_pipeline_in_one_process: false
+settings:
+  triggers: null
+spark_config: {}
+tags: []
+type: python
+uuid: dbt_build_silver
+variables_dir: /home/src/mage_data/scheduler
+widgets: []

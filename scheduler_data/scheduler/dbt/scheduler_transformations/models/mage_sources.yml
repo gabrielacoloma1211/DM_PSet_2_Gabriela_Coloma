@@ -1,0 +1,14 @@
+sources:
+- description: Dataframes Mage upstream blocks
+  loader: mage
+  name: mage_scheduler_transformations
+  schema: analytics
+  tables:
+  - description: Dataframe for block `create_partitions` of the `dbt_build_gold` mage
+      pipeline.
+    identifier: mage_dbt_build_gold_create_partitions
+    meta:
+      block_uuid: create_partitions
+      pipeline_uuid: dbt_build_gold
+    name: dbt_build_gold_create_partitions
+version: 2

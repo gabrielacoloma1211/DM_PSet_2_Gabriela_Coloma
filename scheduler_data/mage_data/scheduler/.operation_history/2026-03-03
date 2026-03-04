@@ -1,0 +1,3 @@
+{"operation": "create", "resource": {"type": "pipeline", "uuid": "taxi_zones"}, "timestamp": 1772581522, "user": null}
+{"operation": "create", "resource": {"type": "pipeline", "uuid": "yellow_taxi_trips"}, "timestamp": 1772581536, "user": null}
+{"operation": "create", "resource": {"type": "pipeline", "uuid": "green_taxi_trips"}, "timestamp": 1772581567, "user": null}

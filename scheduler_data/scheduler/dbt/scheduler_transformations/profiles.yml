@@ -1,0 +1,12 @@
+scheduler_transformations:
+  outputs:
+    dev:
+      type: postgres
+      host: warehouse
+      user: root
+      password: root
+      port: 5432
+      dbname: ny_taxi
+      schema: analytics
+      threads: 4
+  target: dev

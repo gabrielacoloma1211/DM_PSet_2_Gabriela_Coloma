@@ -1,0 +1,101 @@
+version: 2
+
+models:
+  - name: dim_date
+    description: "Dimension de fechas con keys sustitutas y extras del calendario"
+    columns:
+      - name: date_key
+        description: "Key sustituta unica para las fechas (cada una)"
+        data_tests:
+          - unique
+          - not_null
+
+  - name: dim_zone
+    description: "Dimension de zonas con borough y el nombre de la zona"
+    columns:
+      - name: zone_key
+        description: "ID de la zona"
+        data_tests:
+          - unique
+          - not_null
+
+  - name: dim_vendor
+    description: "Dimension de vendors"
+    columns:
+      - name: vendor_key
+        description: "Key sustituta de vendor"
+        data_tests:
+          - unique
+          - not_null
+
+  - name: dim_service_type
+    description: "Dimension del tipo de servicio que puede ser yellow o green"
+    columns:
+      - name: service_type_key
+        description: "Key para el tipo de servicio"
+        data_tests:
+          - unique
+          - not_null
+          - accepted_values:
+              values: ['yellow', 'green']
+
+  - name: dim_payment_type
+    description: "Dimension de tipos de pago"
+    columns:
+      - name: payment_type_key
+        description: "Key para el tipo de pago"
+        data_tests:
+          - unique
+          - not_null
+
+  - name: fct_trips
+    description: "Tabla de hechos con granularidad 1 fila = 1 viaje"
+    columns:
+      - name: trip_key
+        description: "ID unico del viaje"
+        data_tests:
+          - unique
+          - not_null
+
+      - name: pickup_date
+        description: "Fecha de pickup"
+        data_tests:
+          - not_null
+
+      - name: pu_zone_key
+        description: "FK a dim_zone, zona de pickup"
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('dim_zone')
+              field: zone_key
+
+      - name: do_zone_key
+        description: "FK a dim_zone, zona de dropoff"
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('dim_zone')
+              field: zone_key
+
+      - name: service_type_key
+        description: "FK a dim_service_type"
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('dim_service_type')
+              field: service_type_key
+
+      - name: payment_type_key
+        description: "FK a dim_payment_type"
+        data_tests:
+          - relationships:
+              to: ref('dim_payment_type')
+              field: payment_type_key
+
+      - name: pickup_date_key
+        description: "FK a dim_date, fecha de recogida"
+        data_tests:
+          - relationships:
+              to: ref('dim_date')
+              field: date_key

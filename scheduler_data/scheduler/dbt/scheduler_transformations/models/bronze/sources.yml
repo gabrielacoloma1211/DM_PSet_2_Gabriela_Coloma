@@ -1,0 +1,9 @@
+version: 2
+sources:
+  - name: bronze
+    schema: bronze
+    tables:
+      - name: taxi_trips
+        description: "Datos en raw de los viajes yellow y green de NYC"
+      - name: taxi_zones
+        description: "Lookup de zonas de taxis de NYC"

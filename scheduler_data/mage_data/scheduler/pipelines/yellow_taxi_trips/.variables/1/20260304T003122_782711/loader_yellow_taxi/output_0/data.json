@@ -1,0 +1,1 @@
+{"status": "loaded", "service_type": "yellow", "source_month": "2024-10", "ingest_ts": "pandas._libs.tslibs.timestamps.Timestamp", "row_count": 3833771, "local_file": "/tmp/yellowtripdata2024-10.parquet"}

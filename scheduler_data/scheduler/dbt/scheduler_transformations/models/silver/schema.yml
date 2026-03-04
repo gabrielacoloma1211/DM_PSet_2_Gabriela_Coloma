@@ -1,0 +1,43 @@
+version: 2
+
+models:
+  - name: stg_taxi_zones
+    description: "Dimension de zonas de los taxis NYC con borough y zone"
+    columns:
+      - name: zone_id
+        description: "ID de zona"
+        data_tests:
+          - unique
+          - not_null
+
+  - name: stg_taxi_trips
+    description: "Viajes yellow y green juntos con calidad mínima aplicada"
+    columns:
+      - name: service_type
+        description: "Tipo de servicio osea yellow o green"
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['yellow', 'green']
+      - name: pickup_ts
+        description: "Fecha y hora de pickup"
+        data_tests:
+          - not_null
+      - name: dropoff_ts
+        description: "Fecha y hora de dropoff"
+        data_tests:
+          - not_null
+      - name: pickup_location_id
+        description: "ID de la zona de pickup"
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_taxi_zones')
+              field: zone_id
+      - name: dropoff_location_id
+        description: "ID de la zona de dropoff"
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_taxi_zones')
+              field: zone_id
