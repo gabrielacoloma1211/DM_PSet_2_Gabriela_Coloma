@@ -371,34 +371,6 @@ dbt test                 # Luego testear
 
 ---
 
-### Problema 4: pgAdmin no conecta
-**Síntoma:** `Connection refused`  
-**Causa:** Hostname incorrecto  
-**Solución:** Usar `warehouse` (no `localhost`) como hostname
-
----
-
-### Problema 5: Mage secrets retornan None
-**Síntoma:** `KeyError: None`  
-**Causa:** Variables de entorno mal configuradas  
-**Solución:**
-```python
-from mage_ai.data_preparation.shared.secrets import get_secret_value
-host = get_secret_value("POSTGRES_HOST")  
-```
-
----
-
-### Problema 6: PostgreSQL crashea durante tests
-**Síntoma:** `database system is in recovery mode`  
-**Causa:** Recursos insuficientes  
-**Solución:**
-- Aumentar RAM Docker: Settings → Resources → Memory: 8GB
-- Cerrar aplicaciones pesadas
-- Ejecutar tests en lotes
-
----
-
 
 ## Checklist de aceptación
 
