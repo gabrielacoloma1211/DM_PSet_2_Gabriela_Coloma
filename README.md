@@ -304,9 +304,6 @@ host = get_secret_value("POSTGRES_HOST")
 <img width="943" height="658" alt="Screenshot 2026-03-04 at 2 06 10 AM" src="https://github.com/user-attachments/assets/672bba04-d432-42dd-bdd1-5dadd794df0e" />
 <img width="1007" height="606" alt="Screenshot 2026-03-04 at 2 06 23 AM" src="https://github.com/user-attachments/assets/2ba0fb53-a0e2-4fc3-8982-228c091f6dc5" />
 
-
-```
-
 ---
 
 ## dbt - Transformaciones
@@ -327,16 +324,15 @@ host = get_secret_value("POSTGRES_HOST")
 
 
 **dbt run (Gold):**
-```
+
 <img width="880" height="662" alt="Screenshot 2026-03-04 at 2 07 16 AM" src="https://github.com/user-attachments/assets/5396f472-0625-4c1a-b493-9309b632e58d" />
 
-```
 
 **dbt test:**
-```
+
 <img width="1015" height="655" alt="Screenshot 2026-03-04 at 2 07 42 AM" src="https://github.com/user-attachments/assets/357f5537-5219-43c1-8147-c5a50dc298b4" />
 
-```
+
 
 ---
 
