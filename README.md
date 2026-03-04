@@ -15,6 +15,15 @@ El proyecto implementa un pipeline de datos para NYC TLC (Taxi & Limousine Commi
 
 ## Diagrama de arquitectura
 
+**Bronze Layer (Schema: `bronze`):**  
+Capa de datos crudos sin transformaciones. Almacena los datos tal como llegan de las fuentes externas (archivos Parquet y CSV de NYC TLC). Incluye las tablas `taxi_trips` (viajes yellow y green) y `taxi_zones` (lookup de zonas). La ingesta se realiza mediante pipelines Python en Mage que descargan, validan e insertan los datos en PostgreSQL. Los datos conservan todos los campos originales más metadatos de ingesta (`service_type`, `source_month`, `ingest_ts`).
+
+**Silver Layer (Schema: `analytics_silver`):**  
+Capa de datos limpios y estandarizados. Transforma los datos crudos de bronze aplicando filtros, renombrado de columnas, y cálculos derivados. Se materializa como views dbt para mantener los datos siempre actualizados sin duplicación. Incluye `stg_taxi_zones` (zonas con limpieza básica), `stg_taxi_trips` (viajes filtrados solo para 2024), e `int_trips_enriched` (viajes enriquecidos con métricas calculadas como duración de viaje).
+
+**Gold Layer (Schema: `analytics_gold`):**  
+Capa analítica con modelo dimensional (Star Schema). Organiza los datos en dimensiones y tablas de hechos optimizadas para consultas de negocio. Las dimensiones incluyen `dim_date` (366 días de 2024), `dim_zone` (265 zonas NYC), `dim_service_type` (Yellow/Green), `dim_payment_type` (6 métodos de pago), y `dim_vendor` (4 proveedores). La tabla de hechos `fct_trips` contiene ~37M viajes con métricas de negocio. Todas las tablas se materializan físicamente en PostgreSQL con particionamiento declarativo (RANGE, HASH, LIST) para optimizar el performance de queries analíticos.
+
 <img width="500" height="463" alt="Screenshot 2026-03-04 at 1 42 21 AM" src="https://github.com/user-attachments/assets/29c56d6e-d5ac-41ce-a7b0-ca694bee1d63" />
 
 ---
@@ -53,12 +62,200 @@ docker compose down
 **Acceso a interfaces:**
 - Mage: http://localhost:6789
 - pgAdmin: http://localhost:8081
-  - Email: `admin@admin.com`
-  - Password: `admin`
 
 **Configurar pgAdmin (primera vez):**
 1. Register Server → Name: `warehouse`
-2. Connection: Host=`warehouse`, Port=`5432`, DB=`ny_taxi`, User=`root`, Pass=`root`
+2. Connection: Consultar credenciales en `docker-compose.yml`
+
+---
+
+
+## 4. Pipelines
+
+Existen 6 pipelines principales organizados por capa de la arquitectura medallion:
+
+### Pipelines Bronze
+
+#### `ingest_bronze_yellow`
+**Propósito:** Ingesta de datos Yellow Taxi desde NYC TLC (Parquet)  
+**Bloques:**
+- `loader_yellow_taxi.py` (Data Loader)
+- `exporter_to_postgres.py` (Data Exporter)
+
+**Destino:** `bronze.taxi_trips`
+
+**Parámetros:**
+- `service_type`: 'yellow'
+- `year`: 2024
+- `month`: 1-12
+
+**Segmentación:** Por mes  
+
+---
+
+#### `ingest_bronze_green`
+**Propósito:** Ingesta de datos Green Taxi  
+**Estructura:** Idéntica a yellow, cambia solo el `service_type` a 'green'
+
+---
+
+#### `taxi_zones`
+**Propósito:** Carga del lookup de zonas NYC TLC (CSV estático)  
+**Destino:** `bronze.taxi_zones`
+
+---
+
+**Esquema Bronze resultante:**
+
+**Tablas:**
+- `bronze.taxi_trips` 
+- `bronze.taxi_zones` 
+
+**Columnas principales (taxi_trips):**
+- Todos los campos originales del Parquet (vendorid, pickup/dropoff datetime, passenger_count, trip_distance, fare_amount, etc.)
+- `service_type` (TEXT) → 'yellow' o 'green'
+- `source_month` (TEXT) → '2024-01', '2024-02', etc.
+- `ingest_ts` (TIMESTAMPTZ) → Momento de inserción UTC
+
+**Características:**
+- Datos crudos sin transformaciones
+- Almacenamiento completo del payload original
+- Idempotencia no garantizada (puede haber duplicados si se reejecuta)
+
+---
+
+### Pipelines Silver
+
+#### `dbt_build_silver`
+**Propósito:** Transformación Bronze → Silver (views)  
+**Bloques:**
+- `stg_taxi_zones` (DBT)
+- `stg_taxi_trips` (DBT)
+- `int_trips_enriched` (DBT)
+
+**Tecnología:** dbt  
+**Materialización:** Views  
+**Dependencias:** Auto-detectadas por dbt con `{{ ref() }}`
+
+---
+
+**Esquema Silver resultante:**
+
+**Views:**
+- `stg_taxi_zones`: Zonas con limpieza básica (normalización de nombres)
+- `stg_taxi_trips`: Viajes filtrados (solo 2024) con campos renombrados a convención estándar
+- `int_trips_enriched`: Viajes enriquecidos con joins a zonas y cálculos derivados
+
+**Características:**
+- Materialización: Views (datos siempre frescos, sin duplicación)
+- Filtros aplicados: solo año 2024, elimina registros con datos anómalos
+- Campos calculados: `trip_duration_min` (diferencia entre dropoff y pickup)
+- Renombrado consistente: `pickup_location_id`, `dropoff_location_id`, etc.
+
+---
+
+### Pipelines Gold
+
+#### `dbt_build_gold`
+**Propósito:** Transformación Silver → Gold (tablas particionadas con modelo dimensional)  
+**Bloques:**
+1. `creating_partitions` (Python Data Exporter - crea estructuras particionadas)
+2. `dim_date` (DBT)
+3. `dim_zone` (DBT)
+4. `dim_service_type` (DBT)
+5. `dim_payment_type` (DBT)
+6. `dim_vendor` (DBT)
+7. `fct_trips` (DBT)
+
+**Dependencias:**
+- Todos los dims dependen de `creating_partitions`
+- `fct_trips` depende de todos los dims + `int_trips_enriched`
+
+---
+
+**Esquema Gold resultante:**
+
+**Dimensiones:**
+- `dim_date` → Date spine completo 2024 con atributos temporales
+- `dim_zone` (HASH partitioned) → Zonas NYC con borough, zona, service_zone
+- `dim_service_type` (LIST partitioned) → Yellow Taxi / Green Taxi
+- `dim_payment_type` (LIST partitioned) → Credit Card, Cash, No Charge, Dispute, Unknown, Voided
+- `dim_vendor` → Unknown/NULL, Creative Mobile Technologies, VeriFone, Other
+
+**Fact Table:**
+- `fct_trips` (RANGE partitioned por mes en 12 particiones)
+
+**Columnas principales (fct_trips):**
+- `trip_key` (BIGINT, PK) → Surrogate key generado con row_number()
+- `pickup_date` (DATE) → Fecha de pickup (columna de particionamiento)
+- `pickup_datetime`, `dropoff_datetime` (TIMESTAMP) → Timestamps completos
+- `pu_zone_key`, `do_zone_key` (INT) → Foreign Keys a dim_zone
+- `service_type_key` (VARCHAR) → Foreign Key a dim_service_type
+- `payment_type_key` (INT) → Foreign Key a dim_payment_type
+- `vendor_key` (INT) → Foreign Key a dim_vendor
+- `pickup_date_key` (INT) → Foreign Key a dim_date
+- **Métricas:** `passenger_count`, `trip_distance`, `trip_duration_min`, `fare_amount`, `tip_amount`, `tolls_amount`, `total_amount`
+- **Metadata:** `source_month`, `ingest_ts`
+
+**Características:**
+- Materialización: Tables
+- Primary Keys en todas las dimensiones
+- Foreign Keys validados con dbt tests (relationships)
+- Particionamiento declarativo optimizado por tipo de consulta:
+  - RANGE en fct_trips (filtros por fecha)
+  - HASH en dim_zone (distribución uniforme)
+  - LIST en dim_service_type y dim_payment_type (categorías discretas)
+
+---
+
+### Pipeline de Validación
+
+#### `quality_checks`
+**Propósito:** Validación de calidad de datos en todas las capas  
+**Bloque:** `run_tests_dbt` (Generic dbt command: `test`)  
+**Tests:** 32 tests automatizados
+
+**Cobertura:**
+- **unique:** PKs de dimensiones y fact table
+- **not_null:** Campos críticos (PKs, fechas, FKs)
+- **relationships:** Integridad referencial fact → dims
+- **accepted_values:** Validación de categorías (service_type: yellow/green)
+
+**Tiempo de ejecución:** ~5-10 minutos para 37M filas
+
+---
+
+## Triggers configurado
+
+### Schedule Trigger: `ingest_monthly`
+**Pipeline:** `yellow_taxi_trips`  
+**Tipo:** Schedule  
+**Frecuencia:** Semanal (domingos 2:00 AM)  
+**Estado:** Inactive (configurado para demostración)
+
+### Schedule Trigger: `ingest_bronze_green`
+**Pipeline:** `green_taxi_trips`  
+**Tipo:** Schedule  
+**Frecuencia:** Semanal (domingos 2:00 AM)  
+**Estado:** Inactive (configurado para demostración)
+
+### API Trigger
+
+Además del Schedule Trigger, se configuraron **API Triggers** para automatizar la ingesta mensual secuencial.
+
+## `trigger_yellow_taxi.py` y `trigger_green_taxi.py`
+
+**Tipo:** Custom Python Script (externo a Mage)  
+**Propósito:** Disparar el pipeline de ingesta mes por mes para todo 2024  
+**Tecnología:** Python + requests (Mage API)
+
+**Funcionamiento:**
+
+1. **Dispara el pipeline** con parámetros `service_type`, `year`, `month`
+2. **Espera a que termine** cada ejecución (polling cada 30 segundos)
+3. **Verifica el estado** (completed/failed/canceled)
+4. **Avanza al siguiente mes** solo si el anterior fue exitoso
+5. **Gestiona errores** con logs descriptivos
 
 ---
 
@@ -80,159 +277,6 @@ from mage_ai.data_preparation.shared.secrets import get_secret_value
 host = get_secret_value("POSTGRES_HOST")
 ```
 
----
-
-## Pipelines
-
-Existen 6 pipelines principales:
-
-### 1. `ingest_bronze_yellow`
-**Propósito:** Ingesta de datos Yellow Taxi desde NYC TLC (Parquet)  
-**Bloques:**
-- `loader_yellow_taxi.py` (Data Loader)
-- `exporter_to_postgres.py` (Data Exporter)
-
-**Destino:** `bronze.taxi_trips`
-
-**Parámetros:**
-- `service_type`: 'yellow'
-- `year`: 2024
-- `month`: 1-12
-
-**Segmentación:** Por mes  
-**Límites y reintentos:** Manejo de HTTP 404 con validación de disponibilidad
-
----
-
-### 2. `ingest_bronze_green`
-**Propósito:** Ingesta de datos Green Taxi  
-**Estructura:** Idéntica a yellow, cambia solo el `service_type` a 'green'
-
----
-
-### 3. `taxi_zones`
-**Propósito:** Carga del lookup de zonas NYC TLC (CSV estático)  
-**Destino:** `bronze.taxi_zones`
-
----
-
-### 4. `dbt_build_silver`
-**Propósito:** Transformación Bronze → Silver (views)  
-**Bloques:**
-- `stg_taxi_zones` (DBT)
-- `stg_taxi_trips` (DBT)
-- `int_trips_enriched` (DBT)
-
-**Tecnología:** dbt  
-**Materialización:** Views  
-**Dependencias:** Auto-detectadas por dbt con `{{ ref() }}`
-
----
-
-### 5. `dbt_build_gold`
-**Propósito:** Transformación Silver → Gold (tablas particionadas)  
-**Bloques:**
-1. `creating_partitions` (Python Data Exporter - crea estructuras particionadas)
-2. `dim_date` (DBT)
-3. `dim_zone` (DBT)
-4. `dim_service_type` (DBT)
-5. `dim_payment_type` (DBT)
-6. `dim_vendor` (DBT)
-7. `fct_trips` (DBT)
-
-**Dependencias:**
-- Todos los dims dependen de `creating_partitions`
-- `fct_trips` depende de todos los dims + `int_trips_enriched`
-
----
-
-### 6. `quality_checks`
-**Propósito:** Validación de calidad de datos  
-**Bloque:** `run_tests_dbt` (Generic dbt command: `test`)  
-**Tests:** 32 tests (unique, not_null, relationships, accepted_values)
-
----
-
-## Trigger configurado
-
-### Schedule Trigger: `ingest_monthly`
-**Pipeline:** `ingest_bronze_yellow`  
-**Tipo:** Schedule  
-**Frecuencia:** Semanal (domingos 2:00 AM)  
-**Estado:** Inactive (configurado para demostración)
-
-### Pipeline Chaining (Manual)
-**Flujo documentado:**
-```
-ingest_bronze_yellow ──┐
-                       ├──→ dbt_build_silver → dbt_build_gold → quality_checks
-ingest_bronze_green ───┘
-```
-
-**Política:** Event triggers automáticos requieren Mage Enterprise. En desarrollo se ejecutan manualmente en secuencia.
-
----
-
-## Esquemas de datos
-
-### Bronze (Schema: `bronze`)
-**Tablas:**
-- `bronze.taxi_trips`
-- `bronze.taxi_zones`
-
-**Columnas principales (taxi_trips):**
-- Todos los campos originales del Parquet
-- `service_type` (TEXT) → 'yellow' o 'green'
-- `source_month` (TEXT) → '2024-01', '2024-02', etc.
-- `ingest_ts` (TIMESTAMPTZ) → Momento de inserción
-
-**Características:**
-- Datos crudos sin transformaciones
-- Idempotencia no garantizada (puede haber duplicados si se reejecuta)
-
----
-
-### Silver (Schema: `analytics_silver`)
-**Views:**
-- `stg_taxi_zones`: Zonas con limpieza básica
-- `stg_taxi_trips`: Viajes filtrados (solo 2024) y renombrados
-- `int_trips_enriched`: Viajes enriquecidos con cálculos derivados
-
-**Características:**
-- Materialización: Views (datos siempre frescos)
-- Filtros aplicados: solo año 2024
-- Campos calculados: `trip_duration_min`
-
----
-
-### Gold (Schema: `analytics_gold`)
-**Tablas:**
-
-**Dimensiones:**
-- `dim_date` (366 filas) → Date spine 2024
-- `dim_zone` (265 filas, HASH partitioned) → Zonas NYC
-- `dim_service_type` (2 filas, LIST partitioned) → Yellow/Green
-- `dim_payment_type` (6 filas, LIST partitioned) → Métodos de pago
-- `dim_vendor` (4 filas) → Proveedores de tecnología
-
-**Fact:**
-- `fct_trips` (~37M filas, RANGE partitioned por mes)
-
-**Columnas principales (fct_trips):**
-- `trip_key` (BIGINT, PK) → Surrogate key con row_number()
-- `pickup_date` (DATE) → Fecha de pickup
-- `pu_zone_key`, `do_zone_key` (INT) → FKs a dim_zone
-- `service_type_key` (VARCHAR) → FK a dim_service_type
-- `payment_type_key` (INT) → FK a dim_payment_type
-- `vendor_key` (INT) → FK a dim_vendor
-- `pickup_date_key` (INT) → FK a dim_date
-- Métricas: `trip_distance`, `fare_amount`, `tip_amount`, `total_amount`, etc.
-
-**Características:**
-- Materialización: Tablas (para soportar particionamiento)
-- PKs en todas las dimensiones
-- FKs validados con dbt tests (relationships)
-- Particionamiento declarativo (RANGE, HASH, LIST)
 
 ---
 
@@ -256,39 +300,11 @@ ingest_bronze_green ───┘
 
 ### Evidencia de particionamiento
 
-**Comando `\d+`:**
-```sql
-\d+ analytics_gold.fct_trips
-
-Partitioned table "analytics_gold.fct_trips"
-Partition key: RANGE (pickup_date)
-Partitions: fct_trips_2024_01 FOR VALUES FROM ('2024-01-01') TO ('2024-02-01'),
-            fct_trips_2024_02 FOR VALUES FROM ('2024-02-01') TO ('2024-03-01'),
-            ...
-```
-
 **EXPLAIN (Partition Pruning):**
+<img width="943" height="658" alt="Screenshot 2026-03-04 at 2 06 10 AM" src="https://github.com/user-attachments/assets/672bba04-d432-42dd-bdd1-5dadd794df0e" />
+<img width="1007" height="606" alt="Screenshot 2026-03-04 at 2 06 23 AM" src="https://github.com/user-attachments/assets/2ba0fb53-a0e2-4fc3-8982-228c091f6dc5" />
 
-Query 1 - RANGE:
-```sql
-EXPLAIN (ANALYZE, BUFFERS, VERBOSE)
-SELECT COUNT(*), AVG(fare_amount), SUM(total_amount)
-FROM analytics_gold.fct_trips
-WHERE pickup_date >= '2024-02-01' AND pickup_date < '2024-03-01';
 
--- Resultado: Seq Scan on analytics_gold.fct_trips_2024_02
--- Interpretación: Solo 1 de 12 particiones escaneada
-```
-
-Query 2 - HASH:
-```sql
-EXPLAIN (ANALYZE, BUFFERS, VERBOSE)
-SELECT borough, zone, service_zone
-FROM analytics_gold.dim_zone
-WHERE zone_key = 112;
-
--- Resultado: Index Scan ... on analytics_gold.dim_zone_p0
--- Interpretación: Solo 1 de 4 particiones accedida
 ```
 
 ---
@@ -304,47 +320,23 @@ WHERE zone_key = 112;
 
 ### Logs de ejecución
 
+**dbt run (Silver):**
+<img width="1002" height="661" alt="Screenshot 2026-03-04 at 2 08 20 AM" src="https://github.com/user-attachments/assets/3929f7da-4ce6-4715-91b6-ede4d36d9106" />
+<img width="977" height="658" alt="Screenshot 2026-03-04 at 2 08 31 AM" src="https://github.com/user-attachments/assets/1976a840-f109-4f2d-8347-e5a382314e28" />
+<img width="1019" height="634" alt="Screenshot 2026-03-04 at 2 08 43 AM" src="https://github.com/user-attachments/assets/fb6d58d0-f365-49e6-9ff8-fbff3624e7bb" />
+
+
 **dbt run (Gold):**
 ```
-Running with dbt=1.8.7
-Found 6 models, 32 tests
+<img width="880" height="662" alt="Screenshot 2026-03-04 at 2 07 16 AM" src="https://github.com/user-attachments/assets/5396f472-0625-4c1a-b493-9309b632e58d" />
 
-1 of 6 OK created table model analytics_gold.dim_date ........ [INSERT 366 in 0.45s]
-2 of 6 OK created table model analytics_gold.dim_zone ........ [INSERT 265 in 0.52s]
-3 of 6 OK created table model analytics_gold.dim_service_type [INSERT 2 in 0.38s]
-4 of 6 OK created table model analytics_gold.dim_payment_type [INSERT 6 in 0.41s]
-5 of 6 OK created table model analytics_gold.dim_vendor ...... [INSERT 4 in 0.39s]
-6 of 6 OK created table model analytics_gold.fct_trips ....... [INSERT 37M in 1245s]
-
-Done. PASS=6 WARN=0 ERROR=0 SKIP=0 TOTAL=6
 ```
 
 **dbt test:**
 ```
-Running with dbt=1.8.7
-Found 9 models, 32 data tests
+<img width="1015" height="655" alt="Screenshot 2026-03-04 at 2 07 42 AM" src="https://github.com/user-attachments/assets/357f5537-5219-43c1-8147-c5a50dc298b4" />
 
-1 of 32 PASS test unique_dim_date_date_key .............. [PASS in 0.23s]
-...
-32 of 32 PASS test unique_stg_taxi_zones_zone_id ........ [PASS in 0.19s]
-
-Done. PASS=32 WARN=0 ERROR=0 SKIP=0 TOTAL=32
 ```
-
----
-
-## Validaciones / Volumetría
-
-**Verificaciones realizadas:**
-- ✅ Bronze: ~37M filas cargadas para 2024
-- ✅ Silver: Views funcionando correctamente
-- ✅ Gold: 37M filas en fct_trips, dims con row counts esperados
-- ✅ Tests: 32/32 pasando
-- ✅ Particiones: 12 particiones creadas y pobladas uniformemente
-
-**Idempotencia:**
-- Bronze: NO garantizada (puede duplicar en reejecuciones)
-- Gold: SÍ garantizada (dbt trunca y reinserta en cada ejecución)
 
 ---
 
@@ -395,7 +387,7 @@ dbt test                 # Luego testear
 **Solución:**
 ```python
 from mage_ai.data_preparation.shared.secrets import get_secret_value
-host = get_secret_value("POSTGRES_HOST")  # ✅
+host = get_secret_value("POSTGRES_HOST")  
 ```
 
 ---
@@ -410,60 +402,23 @@ host = get_secret_value("POSTGRES_HOST")  # ✅
 
 ---
 
-## Runbook
-
-**Ejecución completa del pipeline:**
-
-1. Levantar stack: `docker compose up -d`
-2. Ejecutar ingesta bronze:
-   - Pipeline `ingest_bronze_yellow` → Run
-   - Pipeline `ingest_bronze_green` → Run
-   - Pipeline `taxi_zones` → Run
-3. Ejecutar transformación silver:
-   - Pipeline `dbt_build_silver` → Run
-4. Ejecutar transformación gold:
-   - Pipeline `dbt_build_gold` → Run (esperar ~25-30 min)
-5. Ejecutar validaciones:
-   - Pipeline `quality_checks` → Run (esperar ~5-10 min)
-
-**Si falla:**
-- Revisar logs en Mage
-- Verificar espacio en disco
-- Reintentar ejecución (gold es idempotente)
-- Si falla por auth/secrets, revisar Mage Secrets
-
----
 
 ## Checklist de aceptación
 
-☑ Mage y Postgres se comunican por nombre de servicio  
-☑ Todos los secretos están en Mage Secrets; no hay secretos en el repo  
-☑ Pipelines de bronze ingresan datos 2024 exitosamente  
-☑ Trigger schedule configurado (inactive para demo)  
-☑ Pipeline chaining documentado y probado manualmente  
-☑ Esquemas bronze/silver/gold con datos poblados  
-☑ Particionamiento declarativo implementado (RANGE, HASH, LIST)  
-☑ Partition pruning verificado con EXPLAIN ANALYZE  
-☑ dbt materializations configuradas correctamente (views en silver, tables en gold)  
-☑ 32 tests dbt pasando (unique, not_null, relationships, accepted_values)  
-☑ Idempotencia verificada en gold  
-☑ Volumetría validada: ~37M filas en fct_trips  
-☑ Troubleshooting documentado con 6+ problemas y soluciones  
-☑ Runbook de ejecución disponible
+☑ Docker Compose levanta Postgres + Mage
+☑ Credenciales en Mage Secrets y .env (solo .env.example en repo)
+☑ Pipeline ingest_bronze mensual e idempotente + tabla de cobertura
+☑ dbt corre dentro de Mage: dbt_build_silver, dbt_build_gold, quality_checks
+☑ Silver materialized = views; Gold materialized = tables
+☑ Gold tiene esquema estrella completo
+☑ Particionamiento: RANGE en fct_trips, HASH en dim_zone, LIST en dim_service_type y dim_payment_type
+☑ README incluye \d+ y EXPLAIN (ANALYZE, BUFFERS) con pruning
+☑ dbt test pasa desde Mage
+☑ Notebook responde 20 preguntas usando solo gold.*
+☑ Triggers configurados y evidenciados
 
 ---
 
 ## Evidencias
 
-Se encuentran en la carpeta `evidencias/` con:
-- Configuración de Mage Secrets (nombres visibles, valores ocultos)
-- Trigger schedule configurado (captura)
-- Pipeline tree de `dbt_build_gold` mostrando dependencias
-- Tablas gold con registros en pgAdmin
-- Logs de `dbt run` y `dbt test` (32/32 PASS)
-- EXPLAIN ANALYZE mostrando partition pruning
-- Notebook `data_analysis.ipynb` con 20 preguntas de negocio respondidas
-
----
-
-**Fin del README**
+Se encuentran en la carpeta `evidencias/`
