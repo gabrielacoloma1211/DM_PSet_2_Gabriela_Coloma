@@ -80,6 +80,7 @@ Existen 6 pipelines principales organizados por capa de la arquitectura medallio
 **Propósito:** Ingesta de datos Yellow Taxi desde NYC TLC (Parquet)  
 **Bloques:**
 - `loader_yellow_taxi.py` (Data Loader)
+- `transformer_yellow_taxi.py` (Data Transformer
 - `exporter_to_postgres.py` (Data Exporter)
 
 **Destino:** `bronze.taxi_trips`
