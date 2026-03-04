@@ -15,15 +15,15 @@ El proyecto implementa un pipeline de datos para NYC TLC (Taxi & Limousine Commi
 
 ## Diagrama de arquitectura
 
-[AQUÍ PEGA TU DIAGRAMA TEXTUAL]
+<img width="500" height="463" alt="Screenshot 2026-03-04 at 1 42 21 AM" src="https://github.com/user-attachments/assets/29c56d6e-d5ac-41ce-a7b0-ca694bee1d63" />
 
 ---
 
 ## Cobertura de datos
 
-[AQUÍ PEGA TU TABLA DE COBERTURA POR MES Y SERVICE_TYPE]
+<img width="253" height="514" alt="Screenshot 2026-03-04 at 1 47 02 AM" src="https://github.com/user-attachments/assets/e9b5259d-7624-44f5-80ec-fecfb788beaa" />
 
-**Nota:** Proyecto ajustado a solo 2024 por limitaciones de espacio en disco (disponible: <2GB).
+**Nota:** Proyecto ajustado a solo 2024 por limitaciones de espacio en disco.
 
 ---
 
