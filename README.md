@@ -402,15 +402,35 @@ host = get_secret_value("POSTGRES_HOST")
 ## Checklist de aceptación
 
 ☑ Docker Compose levanta Postgres + Mage
+
+
 ☑ Credenciales en Mage Secrets y .env (solo .env.example en repo)
+
+
 ☑ Pipeline ingest_bronze mensual e idempotente + tabla de cobertura
+
+
 ☑ dbt corre dentro de Mage: dbt_build_silver, dbt_build_gold, quality_checks
+
+
 ☑ Silver materialized = views; Gold materialized = tables
+
+
 ☑ Gold tiene esquema estrella completo
+
+
 ☑ Particionamiento: RANGE en fct_trips, HASH en dim_zone, LIST en dim_service_type y dim_payment_type
+
+
 ☑ README incluye \d+ y EXPLAIN (ANALYZE, BUFFERS) con pruning
+
+
 ☑ dbt test pasa desde Mage
+
+
 ☑ Notebook responde 20 preguntas usando solo gold.*
+
+
 ☑ Triggers configurados y evidenciados
 
 ---
