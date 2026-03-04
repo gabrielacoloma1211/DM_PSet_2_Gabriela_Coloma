@@ -9,7 +9,7 @@
 
 ## Resumen
 
-El proyecto implementa un pipeline de datos para NYC TLC (Taxi & Limousine Commission) siguiendo una arquitectura medallion (Bronze → Silver → Gold). Los datos se extraen desde archivos Parquet públicos, se transforman con dbt, y se almacenan en PostgreSQL con particionamiento declarativo. La orquestación se realiza en Mage AI, desplegado con Docker Compose, y las credenciales se gestionan con Mage Secrets.
+El proyecto implementa un pipeline de datos para NYC TLC siguiendo una arquitectura medallion (Bronze → Silver → Gold). Los datos se extraen desde archivos Parquet públicos, se transforman con dbt, y se almacenan en PostgreSQL con particionamiento declarativo. La orquestación se realiza en Mage AI, desplegado con Docker Compose, y las credenciales se gestionan con Mage Secrets.
 
 ---
 
