@@ -47,12 +47,12 @@ docker compose down
 
 **Servicios:**
 - `warehouse`: PostgreSQL (5432)
-- `warehouse_ui`: pgAdmin (8080)
+- `warehouse_ui`: pgAdmin (8081)
 - `scheduler`: Mage (6789)
 
 **Acceso a interfaces:**
 - Mage: http://localhost:6789
-- pgAdmin: http://localhost:8080
+- pgAdmin: http://localhost:8081
   - Email: `admin@admin.com`
   - Password: `admin`
 
